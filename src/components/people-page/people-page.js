@@ -1,18 +1,15 @@
 import React, { Component } from "react";
 import ItemList from "../item-list";
-import PersonDetails from "../person-details";
+import ItemDetails from "../item-details";
+import Row from "../row";
 import "./people-page.css";
-import ErrorIndicator from "../error-indicator";
+
+import ErrorBoundry from "../error-boundry";
 
 export default class PeoplePage extends Component {
 	state = {
-		seletedPerson: 5,
-		hasError: false
+		seletedPerson: 5
 	};
-
-	componentDidCatch() {
-		this.setState({ hasError: true });
-	}
 
 	onPersonSelected = id => {
 		this.setState({
@@ -21,22 +18,20 @@ export default class PeoplePage extends Component {
 	};
 
 	render() {
-		if (this.state.hasError) {
-			return <ErrorIndicator />;
-		}
+		const itemList = (
+			<ItemList
+				onItemSelected={this.onPersonSelected}
+				getData={this.props.getData}
+			>
+				{i => `${i.name} (${i.birthYear})`}
+			</ItemList>
+		);
 
+		const personalDetails = <ItemDetails personId={this.state.seletedPerson} />;
 		return (
-			<div className="row mb2">
-				<div className="col-md-6">
-					<ItemList
-						onItemSelected={this.onPersonSelected}
-						getData={this.swapiService.getAllPeople}
-					/>
-				</div>
-				<div className="col-md-6">
-					<PersonDetails personId={this.state.seletedPerson} />
-				</div>
-			</div>
+			<ErrorBoundry>
+				<Row left={itemList} right={personalDetails} />;
+			</ErrorBoundry>
 		);
 	}
 }
