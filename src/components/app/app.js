@@ -7,13 +7,15 @@ import ItemList from "../item-list";
 import ItemDetails, { Record } from "../item-details";
 import Row from "../row";
 import SwapiService from "../../services/swapi-service";
+import { SwapiServiceProvider } from "../swapi-service-context";
+
 import {
 	PersonDetails,
 	PlanetDetails,
 	StarshipDetails,
 	PersonList,
 	PlanetList,
-	StarshipList
+	StarshipList,
 } from "../sw-components";
 
 import "./app.css";
@@ -26,7 +28,7 @@ export default class App extends Component {
 			getPerson,
 			getStarship,
 			getPersonImage,
-			getStarshipImage
+			getStarshipImage,
 		} = this.swapiService;
 
 		const personDetails = (
@@ -53,17 +55,17 @@ export default class App extends Component {
 
 		return (
 			<div>
-				<Header />
-				<PersonDetails itemId={11}></PersonDetails>
-				<PlanetDetails itemId={11}></PlanetDetails>
-				<StarshipDetails itemId={11}></StarshipDetails>
+				<SwapiServiceProvider value={this.swapiService}>
+					<Header />
+					<PersonDetails itemId={11}></PersonDetails>
+					<PlanetDetails itemId={11}></PlanetDetails>
+					<StarshipDetails itemId={11}></StarshipDetails>
 
-				<PersonList>{({ name }) => <span>{name}</span>}</PersonList>
-				<StarshipList>{({ name }) => <span>{name}</span>}</StarshipList>
-				<PlanetList>{({ name }) => <span>{name}</span>}</PlanetList>
-				{/* 				<RandomPlanet />
-				<PeoplePage getData={this.swapiService.getAllPeople} /> */}
-				<Row left={personDetails} right={starshipDetails} />
+					<PersonList />
+					<StarshipList />
+					<PlanetList />
+					<Row left={personDetails} right={starshipDetails} />
+				</SwapiServiceProvider>
 			</div>
 		);
 	}
