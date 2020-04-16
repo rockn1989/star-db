@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import SwapiService from "../../services/swapi-service";
 import Spinner from "../spinner";
 import "./item-details.css";
 
@@ -15,12 +14,10 @@ const Record = ({ item, field, label }) => {
 export { Record };
 
 export default class ItemDetails extends Component {
-	swapiService = new SwapiService();
-
 	state = {
 		item: null,
 		image: null,
-		loading: false
+		loading: false,
 	};
 
 	componentDidMount() {
@@ -28,24 +25,33 @@ export default class ItemDetails extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.personId !== prevProps.personId) {
+		if (
+			this.props.itemId !== prevProps.itemId ||
+			this.props.getData !== prevProps.getData ||
+			this.props.getImageUrl !== prevProps.getImageUrl
+		) {
 			this.updateItem();
 
 			this.setState({
-				loading: true
+				loading: true,
 			});
 		}
 	}
 
 	updateItem() {
-		const { personId, getData, getImageUrl } = this.props;
-		if (!personId) {
+		const { itemId, getData, getImageUrl } = this.props;
+
+		if (!itemId) {
 			return;
 		}
 
+		/* 		getData(itemId).then((item) => {
+			console.log(item);
+		}); */
+
 		this.setState({ loading: true });
 
-		getData(personId).then(item => {
+		getData(itemId).then((item) => {
 			this.setState({ item, image: getImageUrl(item), loading: false });
 		});
 	}
@@ -64,12 +70,12 @@ export default class ItemDetails extends Component {
 
 		return (
 			<div className="person-details card">
-				<img className="person-image" src={image} />
+				<img className="person-image" src={image} alt={name} />
 
 				<div className="card-body">
 					<h4>{name}</h4>
 					<ul className="list-group list-group-flush">
-						{React.Children.map(this.props.children, child => {
+						{React.Children.map(this.props.children, (child) => {
 							return React.cloneElement(child, { item });
 						})}
 					</ul>

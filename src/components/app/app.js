@@ -1,71 +1,43 @@
 import React, { Component } from "react";
 
 import Header from "../header";
-import RandomPlanet from "../random-planet";
-import PeoplePage from "../people-page";
-import ItemList from "../item-list";
-import ItemDetails, { Record } from "../item-details";
-import Row from "../row";
+import DummySwapiService from "../../services/dummy-swapi-service";
 import SwapiService from "../../services/swapi-service";
 import { SwapiServiceProvider } from "../swapi-service-context";
-
-import {
-	PersonDetails,
-	PlanetDetails,
-	StarshipDetails,
-	PersonList,
-	PlanetList,
-	StarshipList,
-} from "../sw-components";
+import { PeoplePage, PlanetsPage, StarshipsPage } from "../pages";
+import ErrorBoundry from "../error-boundry";
 
 import "./app.css";
 
 export default class App extends Component {
-	swapiService = new SwapiService();
+	state = {
+		swapiService: new SwapiService(),
+	};
+
+	onServiceChange = () => {
+		this.setState(({ swapiService }) => {
+			const Service =
+				swapiService instanceof SwapiService ? DummySwapiService : SwapiService;
+
+			console.log("switched to", `${Service.name}`);
+
+			return {
+				swapiService: new Service(),
+			};
+		});
+	};
 
 	render() {
-		const {
-			getPerson,
-			getStarship,
-			getPersonImage,
-			getStarshipImage,
-		} = this.swapiService;
-
-		const personDetails = (
-			<ItemDetails
-				personId={11}
-				getData={getPerson}
-				getImageUrl={getPersonImage}
-			>
-				<Record field="gender" label="Gender" />
-			</ItemDetails>
-		);
-
-		const starshipDetails = (
-			<ItemDetails
-				personId={5}
-				getData={getStarship}
-				getImageUrl={getStarshipImage}
-			>
-				<Record field="model" label="Model" />
-				<Record field="length" label="Length" />
-				<Record field="costInCredits" label="Coast" />
-			</ItemDetails>
-		);
-
 		return (
 			<div>
-				<SwapiServiceProvider value={this.swapiService}>
-					<Header />
-					<PersonDetails itemId={11}></PersonDetails>
-					<PlanetDetails itemId={11}></PlanetDetails>
-					<StarshipDetails itemId={11}></StarshipDetails>
-
-					<PersonList />
-					<StarshipList />
-					<PlanetList />
-					<Row left={personDetails} right={starshipDetails} />
-				</SwapiServiceProvider>
+				<ErrorBoundry>
+					<SwapiServiceProvider value={this.state.swapiService}>
+						<Header onServiceChange={this.onServiceChange} />
+						<PeoplePage />
+						<PlanetsPage />
+						<StarshipsPage />
+					</SwapiServiceProvider>
+				</ErrorBoundry>
 			</div>
 		);
 	}
